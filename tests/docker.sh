@@ -16,7 +16,7 @@ if ! docker inspect "$dockerImage" &> /dev/null; then
     false
 fi
 
-if ! docker run --rm "$dockerImage" version &> /dev/null; then
+if ! docker run --rm "$dockerImage" -e VERSION=true &> /dev/null; then
     echo -e "\timage does not run! ${dockerImage}"
     false
 fi
