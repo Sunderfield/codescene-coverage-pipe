@@ -12,11 +12,11 @@ dockerImage=$1
 echo "Testing $dockerImage..."
 
 if ! docker inspect "$dockerImage" &> /dev/null; then
-    echo $'\timage does not exist!'
+    echo -e "\timage does not exist! ${dockerImage}"
     false
 fi
 
 if ! docker run --rm "$dockerImage" version &> /dev/null; then
-    echo $'\timage does not run!'
+    echo -e "\timage does not run! ${dockerImage}"
     false
 fi
