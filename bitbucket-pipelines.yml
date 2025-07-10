@@ -8,6 +8,7 @@ definitions:
           - VERSION="b.$BITBUCKET_BUILD_NUMBER"
           - IMAGE="$DOCKERHUB_USERNAME/$BITBUCKET_REPO_SLUG"
           - docker image build --platform linux/arm64,linux/amd64 -t ${IMAGE}:${VERSION} .
+          - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
           - docker image push ${IMAGE}:${VERSION}
         services:
           - docker
@@ -27,6 +28,7 @@ definitions:
           # Build and push image
           - pip3 install yq
           - RELEASE_VERSION=$(yq -r '.version' pipe.yml)
+          - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
           - docker image tag ${IMAGE}:${VERSION} ${IMAGE}:latest ${IMAGE}:${RELEASE_VERSION}
           - docker image push ${IMAGE}:latest ${IMAGE}:${RELEASE_VERSION}
           # Push tags
