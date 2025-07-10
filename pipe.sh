@@ -5,7 +5,8 @@ set -e
 
 source "$(dirname "$0")/common.sh"
 if [[ -n "$VERSION" && "$VERSION" == "true" ]]; then
-    exec cs-coverage version
+    cs-coverage version; 
+    exit
 fi
 
 if [[ -z "$CS_ACCESS_TOKEN" ]]; then
@@ -24,7 +25,7 @@ else
     VERBOSECOMMAND=""
 fi
 
-exec cs-coverage upload \
+cs-coverage upload \
     $VERBOSECOMMAND \
     --format "$FORMAT" \
     --metric "$METRIC" \
