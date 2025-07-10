@@ -1,15 +1,28 @@
-image: atlassian/default-image:4
+image: atlassian/default-image:5
+
+options:
+  runtime:
+    cloud:
+      version: 3
 
 definitions:
+  services:
+    docker:
+      image:
+        name: docker:28-dind
+      type: docker
   release:
     - step: &build
         name: Build
         script:
           - VERSION="b.$BITBUCKET_BUILD_NUMBER"
           - IMAGE="$DOCKERHUB_USERNAME/$BITBUCKET_REPO_SLUG"
-          - docker image build --platform linux/arm64,linux/amd64 -t ${IMAGE}:${VERSION} .
-          - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-          - docker image push ${IMAGE}:${VERSION}
+          # install buildx because it is not available in the default docker image
+          - export DOCKER_CLI_EXPERIMENTAL=enabled # Enable usage of buildx in Docker version < 23
+
+          - echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USERNAME --password-stdin
+          - docker buildx create --name container-builder --driver docker-container --bootstrap --use
+          - docker buildx build --platform linux/arm64,linux/amd64 -t ${IMAGE}:${VERSION} --push .
         services:
           - docker
         output-variables:
