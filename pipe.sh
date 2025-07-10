@@ -2,10 +2,9 @@
 
 set -e
 
-
 source "$(dirname "$0")/common.sh"
 if [[ -n "$VERSION" && "$VERSION" == "true" ]]; then
-    cs-coverage version; 
+    cs-coverage version
     exit
 fi
 
@@ -29,4 +28,4 @@ cs-coverage upload \
     $VERBOSECOMMAND \
     --format "$FORMAT" \
     --metric "$METRIC" \
-    "$COVERAGE_FILE" \
+    "$COVERAGE_FILE"

@@ -10,6 +10,7 @@
     },
     "lint-staged": {
         "*.{yaml,yml,json,js,md}": "prettier --write",
-        "{Dockerfile,*/Dockerfile}": "prettier --write"
+        "{Dockerfile,*/Dockerfile}": "prettier --write",
+        "*.sh": "prettier --write"
     }
 }
