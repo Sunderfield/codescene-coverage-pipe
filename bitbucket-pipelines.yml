@@ -1,0 +1,85 @@
+image: atlassian/default-image:5
+
+options:
+  runtime:
+    cloud:
+      version: 3
+
+definitions:
+  services:
+    docker:
+      image:
+        name: docker:28-dind
+      type: docker
+  release:
+    - step: &build
+        name: Build
+        script:
+          - VERSION="b.$BITBUCKET_BUILD_NUMBER"
+          - IMAGE="$DOCKERHUB_USERNAME/$BITBUCKET_REPO_SLUG"
+          # install buildx because it is not available in the default docker image
+          - export DOCKER_CLI_EXPERIMENTAL=enabled # Enable usage of buildx in Docker version < 23
+
+          - echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USERNAME --password-stdin
+          - docker buildx create --name container-builder --driver docker-container --bootstrap --use
+          - docker buildx build --load -t ${IMAGE}:${VERSION} .
+        services:
+          - docker
+        caches:
+          - docker
+    - step: &test
+        name: tests
+        script:
+          - VERSION="b.$BITBUCKET_BUILD_NUMBER"
+          - IMAGE="$DOCKERHUB_USERNAME/$BITBUCKET_REPO_SLUG"
+          - ./tests/docker.sh ${IMAGE}:${VERSION}
+        services:
+          - docker
+        caches:
+          - docker
+    - step: &release
+        name: release
+        deployment: production
+        script:
+          - VERSION="b.$BITBUCKET_BUILD_NUMBER"
+          - IMAGE="$DOCKERHUB_USERNAME/$BITBUCKET_REPO_SLUG"
+
+          # Build and push image
+          - pip3 install yq
+          - RELEASE_VERSION=$(yq -r '.version' pipe.yml)
+          - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+          - docker buildx build --platform linux/arm64,linux/amd64 -t {$IMAGE}:${VERSION} --push --progress=plain .
+          # Push tags
+          - git tag -a "${RELEASE_VERSION}" -m "Tagging for release ${VERSION}"
+          - git push origin ${RELEASE_VERSION}
+        services:
+          - docker
+        caches:
+          - docker
+    - step: &checkIfReleaseExists
+        name: Check if release exists
+        script:
+          - pip3 install yq
+          - RELEASE_VERSION=$(yq -r '.version' pipe.yml)
+          - |
+            if git tag -l | grep -q "${RELEASE_VERSION}"; then
+              echo "Release ${RELEASE_VERSION} already exists. Skipping release step.";
+              exit 1;
+            else
+              echo "No existing release found. Proceeding with release.";
+            fi
+
+  develop:
+    - step: *build
+    - step: *test
+
+pipelines:
+  branches:
+    develop:
+      - step: *build
+      - step: *test
+    main:
+      - step: *checkIfReleaseExists
+      - step: *build
+      - step: *test
+      - step: *release

@@ -1,0 +1,27 @@
+name: CodeScene Coverage Pipe
+image: jensfap/codescene-coverage-pipe:0.1.0
+category: Code quality
+description: |
+  This pipe uploads code coverage reports to CodeScene. It supports various formats such as `lcov`, `cobertura`, and `jacoco`. 
+  The pipe requires a valid CodeScene access token, which can be set in the repository settings.
+variables:
+  - name: FORMAT # the format of the coverage report
+    description: |
+      The format of the coverage report. This can be one of the following: 
+      openclover, lcov, dotcover, jacoco, cobertura, ncover, bullseye, open-cover.
+  - name: METRIC # the metric to upload, e.g. "line-coverage", "branch-coverage"
+    description: |
+      The metric to upload. This can be one of the following: condition-decision-coverage, sequence-point-coverage, statement-coverage, line-coverage, method-coverage, decision-coverage, condition-coverage, branch-coverage, function-coverage
+  - name: COVERAGE_FILE # the path to the coverage report file, e.g. "coverage/code-coverage.lcov"
+  - name: CS_ACCESS_TOKEN
+    default: '$CS_ACCESS_TOKEN'
+  - name: VERBOSE
+    default: 'false'
+    description: 'Set to true to enable verbose output.'
+repository: https://bitbucket.org/jens-fap/codescene-coverage-pipe
+maintainer:
+  name: Jens Zonneveld
+  website: https://www.facilityapps.com/
+tags:
+  - coverage
+  - codescene
