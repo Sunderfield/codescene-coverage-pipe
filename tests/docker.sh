@@ -1,5 +1,5 @@
 #!/bin/bash
-# found this at https://blog.brazdeikis.io/posts/docker-image-tests/ 
+# found this at https://blog.brazdeikis.io/posts/docker-image-tests/
 set -eo pipefail
 
 [ "$DEBUG" ] && set -x
@@ -20,4 +20,3 @@ if ! docker run --rm "$dockerImage" version &> /dev/null; then
     echo $'\timage does not run!'
     false
 fi
-
