@@ -1,5 +1,5 @@
 name: CodeScene Coverage Pipe
-image: jensfap/codescene-coverage-pipe:0.1.0
+image: jensfap/codescene-coverage-pipe:0.2.0
 category: Code quality
 description: |
   This pipe uploads code coverage reports to CodeScene. It supports various formats such as `lcov`, `cobertura`, and `jacoco`. 
