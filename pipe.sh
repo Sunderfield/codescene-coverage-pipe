@@ -2,7 +2,6 @@
 
 set -e
 
-source "$(dirname "$0")/common.sh"
 if [[ -n "$VERSION" && "$VERSION" == "true" ]]; then
     cs-coverage version
     exit
