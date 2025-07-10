@@ -2,6 +2,8 @@
 
 set -e
 
+source ~/.bashrc
+
 if [[ -n "$VERSION" && "$VERSION" == "true" ]]; then
     cs-coverage version
     exit
